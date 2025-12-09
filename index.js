@@ -254,11 +254,18 @@ module.exports = function (schema, options) {
         });
     }
 
-    schema.methods.delete = function (deletedBy, callback) {
+    schema.methods.delete = function (deletedBy, options, callback) {
+        if (typeof options === 'function') {
+          callback = options;
+          options = {};
+        }
+
         if (typeof deletedBy === 'function') {
           callback = deletedBy;
           deletedBy = null;
         }
+
+        options = options || {};
 
         callback = adjustCallbackForMongooseVersion(callback);
 
@@ -272,11 +279,19 @@ module.exports = function (schema, options) {
             this.deletedBy = deletedBy;
         }
 
-        if (options.validateBeforeDelete === false) {
-            return this.save({ validateBeforeSave: false }, callback);
+        const saveOptions = { ...options };
+
+        if (options.validateBeforeDelete === false || options.validateBeforeSave === false) {
+            saveOptions.validateBeforeSave = false;
+        } else if (this.options.validateBeforeDelete === false) {
+             saveOptions.validateBeforeSave = false;
+        } else {
+             saveOptions.validateBeforeSave = true;
         }
 
-        return this.save(callback);
+        delete saveOptions.validateBeforeDelete;
+        delete saveOptions.validateBeforeSave;
+        return this.save(saveOptions, callback);
     };
 
     schema.statics.delete =  function (conditions, deletedBy, callback) {
