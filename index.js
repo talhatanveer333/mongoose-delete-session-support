@@ -89,11 +89,11 @@ module.exports = function (schema, options) {
         return mongooseMajorVersion >= 7 ? undefined : callback;
     }
 
-    function updateDocumentsByQuery(schema, conditions, updateQuery, callback) {
+    function updateDocumentsByQuery(schema, conditions, updateQuery, session, callback) {
         if (schema[mainUpdateWithDeletedMethod]) {
-            return schema[mainUpdateWithDeletedMethod](conditions, updateQuery, { multi: true }, callback);
+            return schema[mainUpdateWithDeletedMethod](conditions, updateQuery, { multi: true, session: session || null }, callback);
         } else {
-            return schema[mainUpdateMethod](conditions, updateQuery, { multi: true }, callback);
+            return schema[mainUpdateMethod](conditions, updateQuery, {multi: true, session: session || null }, callback);
         }
     }
 
@@ -279,15 +279,15 @@ module.exports = function (schema, options) {
         return this.save(callback);
     };
 
-    schema.statics.delete =  function (conditions, deletedBy, callback) {
-        if (typeof deletedBy === 'function') {
-            callback = deletedBy;
+    schema.statics.delete =  function (conditions, options, callback) {
+        if (typeof options === 'function') {
+            callback = options;
             conditions = conditions;
-            deletedBy = null;
+            options = null;
         } else if (typeof conditions === 'function') {
             callback = conditions;
             conditions = {};
-            deletedBy = null;
+            options = null;
         }
 
         callback = adjustCallbackForMongooseVersion(callback);
@@ -300,11 +300,8 @@ module.exports = function (schema, options) {
             doc.deletedAt = new Date();
         }
 
-        if (schema.path('deletedBy')) {
-            doc.deletedBy = deletedBy;
-        }
-
-        return updateDocumentsByQuery(this, conditions, doc, callback);
+        const session = options?.session || null;
+        return updateDocumentsByQuery(this, conditions, doc, session, callback);
     };
 
     schema.statics.deleteById =  function (id, deletedBy, callback) {
