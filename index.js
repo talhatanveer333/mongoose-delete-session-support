@@ -116,7 +116,9 @@ module.exports = function (schema, options) {
         if (!this.deleted) {
             this.deleted = false;
         }
-        next();
+        if (mongooseMajorVersion < 9 && typeof next === 'function') {
+            next();
+        }
     });
 
     if (options.overrideMethods) {

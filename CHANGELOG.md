@@ -1,3 +1,12 @@
+## [v1.0.7]
+> December 16, 2025
+- next() function is not available for pre middlewares in mongoose 9 ([abnud11](https://github.com/abnud11)) [#171](https://github.com/dsanel/mongoose-delete/pull/171)
+- upgrade github actions versions from ([abnud11](https://github.com/abnud11)) [#172](https://github.com/dsanel/mongoose-delete/pull/172)
+
+## [v1.0.6]
+> November 6, 2025
+- Improve aggregate implementation's performance ([mareksuscak](https://github.com/mareksuscak)) [#158](https://github.com/dsanel/mongoose-delete/pull/158)
+
 ## [v1.0.5]
 > November 6, 2025
 - fix: Set deleted to false instead of unsetting when calling `restore()` ([vkarpov15](https://github.com/vkarpov15)) [#150](https://github.com/dsanel/mongoose-delete/pull/150)
